@@ -27,35 +27,43 @@ import java.text.SimpleDateFormat;
  * @info:
  */
 public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlayClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+
     private SimpleDateFormat simpleDateFormat;
+    //view
     private VideoView videoView;
     private RelativeLayout mRLButton;
     private RelativeLayout mRLBack;
     private TextView mTVTitle;
     private PlayButton playButton;
-    private String path;//
-    private OnVideoPlayListener onPlayClickLitener;
-    private OnClickMaxWindowListener onMaxWindowClickListener;
-    private OnPlayProgressListener onPlayProgressListener;
     private ImageView mIVMaxWindow;
     private ImageView mIVBack;
     private TextView mTVTime;
     private SeekBar mSeekBar;
+    private Toast toast;
+
+
+    private MediaPlayer mediaPlayer;
+
+    private String title;
+    private String path;//
+    private String totalTimeStr = "";
+
+    private OnVideoPlayListener onPlayClickLitener;
+    private OnClickMaxWindowListener onMaxWindowClickListener;
+    private OnPlayProgressListener onPlayProgressListener;
+    private OnBackClickListener onBackClickListener;
 
     private final int STATE_INIT = 0;
     private final int STATE_PLAYING = 1;
     private final int STATE_PAUSING = 2;
 
-    private Toast toast;
-    private int videoState;
-    private boolean isPreparing;
-    private MediaPlayer mediaPlayer;
-    private String totalTimeStr = "";
-    private OnBackClickListener onBackClickListener;
+
     private boolean showBack;
-    private int seekTime;
+    private boolean isPreparing;
     private boolean autoPlay;
-    private String title;
+
+    private int seekTime;
+    private int videoState;
 
     public VideoPlayerView(Context context) {
         this(context, null);
