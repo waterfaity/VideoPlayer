@@ -244,6 +244,13 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
         }
     };
 
+    /**
+     * 时间转换
+     *
+     * @param currentPosition
+     * @param totalTime
+     * @return
+     */
     private String getTimeStr(int currentPosition, int totalTime) {
         if (simpleDateFormat == null) {
             if (totalTime > 60 * 60 * 1000) {
@@ -284,6 +291,11 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
 
     }
 
+    /**
+     * seekBar¬跳到指定位置
+     *
+     * @param seekBar
+     */
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         if (videoState != STATE_INIT)
@@ -291,35 +303,63 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
         else mSeekBar.setProgress(0);
     }
 
+    /**
+     * 跳到指定位置
+     *
+     * @param time
+     */
     private void seek(int time) {
         if (mediaPlayer != null) {
             mediaPlayer.seekTo(time);
         }
     }
 
+    /**
+     * 返回按钮
+     *
+     * @param onBackClickListener
+     */
     public void setOnBackClickListener(OnBackClickListener onBackClickListener) {
         showBack = onBackClickListener != null;
         if (showBack) mRLBack.setVisibility(VISIBLE);
         this.onBackClickListener = onBackClickListener;
     }
 
+    /**
+     * 初始化播放开始时间
+     *
+     * @param seekTime
+     */
     public void initSeekTime(int seekTime) {
         if (seekTime < 0) seekTime = 0;
         this.seekTime = seekTime;
     }
 
+    /**
+     * 自动播放
+     *
+     * @param autoPlay
+     */
     public void setAutoPlay(boolean autoPlay) {
         this.autoPlay = autoPlay;
     }
 
+    /**
+     * title  和  控制view  隐藏
+     */
     public void dismissControlView() {
         mRLBack.setVisibility(GONE);
         mRLButton.setVisibility(GONE);
     }
 
+    /**
+     * title
+     *
+     * @param title
+     */
     public void setTitle(String title) {
         this.title = title;
-        if (!TextUtils.isEmpty(title)){
+        if (!TextUtils.isEmpty(title)) {
             mTVTitle.setText(title);
         }
     }
