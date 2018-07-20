@@ -1,9 +1,8 @@
 package com.waterfairy.videoplayer;
 
-import android.content.ContentUris;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -13,13 +12,19 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
     public static final String EXTRA_TITLE = "video_title";
     public static final String EXTRA_TIME = "video_seek_time";
 
+    private VideoPlayerView player;
+    private String TAG = "videoPlay";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_play_video);
         String videoPath = getIntent().getStringExtra(EXTRA_PATH);
         int seekTime = getIntent().getIntExtra(EXTRA_TIME, 0);
-        VideoPlayerView player = findViewById(R.id.player);
+        seekTime -= 2000;
+        if (seekTime < 0) seekTime = 0;
+        Log.i(TAG, "onCreate: " + seekTime);
+        player = findViewById(R.id.player);
         player.setOnBackClickListener(this);
         player.setOnPlayListener(this);
         player.dismissMaxButton();
@@ -59,6 +64,19 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
     @Override
     public void onStartPlay() {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        player.onPause();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        player.release();
     }
 
     @Override

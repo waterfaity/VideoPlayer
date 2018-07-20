@@ -16,15 +16,24 @@
             android:theme="@style/FullScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-             </intent-filter>
+            </intent-filter>
         </activity>
-        <activity android:name=".Test"
-                  android:configChanges="keyboardHidden|orientation|screenSize"
-                  android:screenOrientation="userLandscape"
-                  android:theme="@style/FullScreenTheme">
+        <activity
+            android:name=".Test"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="userLandscape"
+            android:theme="@style/FullScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-             </intent-filter>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AudioPlayActivity"
+            android:screenOrientation="userLandscape"
+            android:theme="@style/FullScreenTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
         </activity>
     </application>
 
