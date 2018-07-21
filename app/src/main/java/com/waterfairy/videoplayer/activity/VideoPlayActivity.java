@@ -18,7 +18,6 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
     public static final String EXTRA_TIME = "video_seek_time";
 
     private VideoPlayerView player;
-    private String TAG = "videoPlay";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
