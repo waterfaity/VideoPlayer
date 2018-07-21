@@ -1,13 +1,17 @@
-package com.waterfairy.videoplayer;
+package com.waterfairy.videoplayer.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AudioPlayActivity extends AppCompatActivity implements View.OnClickListener, OnVideoPlayListener {
+import com.waterfairy.videoplayer.R;
+import com.waterfairy.videoplayer.listener.OnMediaPlayListener;
+import com.waterfairy.videoplayer.widget.AudioPlayerView;
+
+public class AudioPlayActivity extends AppCompatActivity implements View.OnClickListener, OnMediaPlayListener {
     public static final String EXTRA_PATH = "audio_path";
     public static final String EXTRA_TITLE = "audio_title";
     private AudioPlayerView audioPlayerView;
@@ -39,34 +43,49 @@ public class AudioPlayActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) return true;
-        return super.onKeyDown(keyCode, event);
-
+        return keyCode == KeyEvent.KEYCODE_BACK || super.onKeyDown(keyCode, event);
     }
 
     @Override
-    public void onError(String errMsg) {
+    public void onMediaError(String errMsg) {
         Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onWorm() {
+    public void onMediaPrepared() {
 
     }
 
     @Override
-    public void onPlayComplete() {
+    public void onMediaPlayComplete() {
 
     }
 
     @Override
-    public void onPausePlay() {
+    public void onMediaPause() {
 
     }
 
     @Override
-    public void onStartPlay() {
+    public void onMediaPlay() {
 
+    }
+
+    @Override
+    public void onMediaRelease() {
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        audioPlayerView.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        audioPlayerView.onResume();
     }
 
     @Override

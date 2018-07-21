@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".VideoPlayActivity"
+            android:name=".activity.VideoPlayActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="userLandscape"
             android:theme="@style/FullScreenTheme">
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Test"
+            android:name=".test.Test"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="userLandscape"
             android:theme="@style/FullScreenTheme">
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AudioPlayActivity"
+            android:name=".activity.AudioPlayActivity"
             android:screenOrientation="userLandscape"
             android:theme="@style/FullScreenTheme">
             <intent-filter>

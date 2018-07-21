@@ -45,7 +45,7 @@
         android:layout_alignParentBottom="true"
         android:background="#66888888">
 
-        <com.waterfairy.videoplayer.PlayButton
+        <com.waterfairy.videoplayer.widget.PlayButtonView
             android:id="@+id/bt_play"
             android:layout_width="45dp"
             android:layout_height="45dp"

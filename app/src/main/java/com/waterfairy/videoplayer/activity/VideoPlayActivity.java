@@ -1,12 +1,17 @@
-package com.waterfairy.videoplayer;
+package com.waterfairy.videoplayer.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
-public class VideoPlayActivity extends AppCompatActivity implements OnBackClickListener, OnVideoPlayListener {
+import com.waterfairy.videoplayer.R;
+import com.waterfairy.videoplayer.listener.OnBackClickListener;
+import com.waterfairy.videoplayer.listener.OnMediaPlayListener;
+import com.waterfairy.videoplayer.widget.VideoPlayerView;
+
+public class VideoPlayActivity extends AppCompatActivity implements OnBackClickListener, OnMediaPlayListener {
 
     public static final String EXTRA_PATH = "video_path";
     public static final String EXTRA_TITLE = "video_title";
@@ -42,27 +47,32 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
     }
 
     @Override
-    public void onError(String errMsg) {
+    public void onMediaError(String errMsg) {
         Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onWorm() {
+    public void onMediaPrepared() {
 
     }
 
     @Override
-    public void onPlayComplete() {
+    public void onMediaPlayComplete() {
 
     }
 
     @Override
-    public void onPausePlay() {
+    public void onMediaPause() {
 
     }
 
     @Override
-    public void onStartPlay() {
+    public void onMediaPlay() {
+
+    }
+
+    @Override
+    public void onMediaRelease() {
 
     }
 

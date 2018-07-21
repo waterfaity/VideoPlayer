@@ -1,4 +1,4 @@
-package com.waterfairy.videoplayer;
+package com.waterfairy.videoplayer.widget;
 
 import android.content.Context;
 import android.os.Handler;
@@ -6,22 +6,24 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.waterfairy.videoplayer.R;
+
 /**
  * @author water_fairy
  * @email 995637517@qq.com
  * @date 2018/7/20 10:49
  * @info:
  */
-public class PlayButton extends android.support.v7.widget.AppCompatImageView implements View.OnClickListener {
+public class PlayButtonView extends android.support.v7.widget.AppCompatImageView implements View.OnClickListener {
 
     private boolean isPlaying = true;
 
-    public PlayButton(Context context) {
+    public PlayButtonView(Context context) {
         this(context, null);
 
     }
 
-    public PlayButton(Context context, AttributeSet attrs) {
+    public PlayButtonView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
         setState(true);

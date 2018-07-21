@@ -5,9 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".VideoPlayActivity">
+    tools:context=".activity.VideoPlayActivity">
 
-    <com.waterfairy.videoplayer.VideoPlayerView
+    <com.waterfairy.videoplayer.widget.VideoPlayerView
          android:layout_width="match_parent"
         android:id="@+id/player"
         android:layout_height="match_parent"/>

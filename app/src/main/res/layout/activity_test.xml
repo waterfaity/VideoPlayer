@@ -6,15 +6,16 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Test">
+    tools:context=".test.Test">
 
-    <com.waterfairy.videoplayer.VideoPlayerView
+    <com.waterfairy.videoplayer.widget.VideoPlayerView
+        android:layout_above="@+id/audio_player"
         android:id="@+id/video_player_view"
-        android:layout_width="300dp"
-        android:layout_height="360dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"/>
 
-    <com.waterfairy.videoplayer.AudioPlayerView
+    <com.waterfairy.videoplayer.widget.AudioPlayerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/audio_player"

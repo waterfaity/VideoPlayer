@@ -1,4 +1,4 @@
-package com.waterfairy.videoplayer;
+package com.waterfairy.videoplayer.listener;
 
 /**
  * @author water_fairy

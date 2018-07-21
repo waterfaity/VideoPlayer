@@ -1,7 +1,8 @@
-package com.waterfairy.videoplayer;
+package com.waterfairy.videoplayer.widget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.waterfairy.videoplayer.R;
+import com.waterfairy.videoplayer.activity.VideoPlayActivity;
+import com.waterfairy.videoplayer.listener.OnBackClickListener;
+import com.waterfairy.videoplayer.listener.OnClickMaxWindowListener;
+import com.waterfairy.videoplayer.listener.OnMediaPlayListener;
+import com.waterfairy.videoplayer.listener.OnPlayProgressListener;
+import com.waterfairy.videoplayer.tool.AudioTool;
+
 import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -26,15 +35,16 @@ import java.text.SimpleDateFormat;
  * @date 2018/7/20 10:38
  * @info:
  */
-public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlayClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class VideoPlayerView extends RelativeLayout implements PlayButtonView.OnPlayClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, AudioManager.OnAudioFocusChangeListener {
 
+    private static final String TAG = "VideoPlayerView";
     private SimpleDateFormat simpleDateFormat;
     //view
     private VideoView videoView;
     private RelativeLayout mRLButton;
     private RelativeLayout mRLBack;
     private TextView mTVTitle;
-    private PlayButton playButton;
+    private PlayButtonView playButtonView;
     private ImageView mIVMaxWindow;
     private ImageView mIVBack;
     private TextView mTVTime;
@@ -48,7 +58,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
     private String path;//
     private String totalTimeStr = "";
 
-    private OnVideoPlayListener onPlayClickLitener;
+    private OnMediaPlayListener onMediaPlayListener;
     private OnClickMaxWindowListener onMaxWindowClickListener;
     private OnPlayProgressListener onPlayProgressListener;
     private OnBackClickListener onBackClickListener;
@@ -57,15 +67,14 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
     private final int STATE_PLAYING = 1;
     private final int STATE_PAUSING = 2;
 
-
+    private int videoState;
+    private int seekTime;
+     private boolean isResumeCanPlay = true;
+    private boolean isPrepare;//准备
+    private boolean hasFocus;
     private boolean showBack;
     private boolean isPreparing;
     private boolean autoPlay;
-
-    private int seekTime;
-    private int videoState;
-    private int pauseTime;
-    private boolean canPlay = true;
 
     public VideoPlayerView(Context context) {
         this(context, null);
@@ -86,7 +95,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
     }
 
     private void initView() {
-        playButton.setOnPlayClickListener(this);
+        playButtonView.setOnPlayClickListener(this);
         toast = Toast.makeText(getContext(), "", Toast.LENGTH_SHORT);
         videoView.setOnClickListener(this);
         findViewById(R.id.bg_view).setOnClickListener(this);
@@ -99,7 +108,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
     }
 
     private void findView() {
-        playButton = findViewById(R.id.bt_play);
+        playButtonView = findViewById(R.id.bt_play);
         videoView = findViewById(R.id.video_view);
         mRLButton = findViewById(R.id.rel_play);
         mIVMaxWindow = findViewById(R.id.img_max_window);
@@ -113,9 +122,8 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
 
     public void setPath(String path) {
         this.path = path;
-        if (autoPlay) {
-            initVideo();
-        }
+        isPrepare = true;
+        initVideo();
     }
 
     @Override
@@ -125,7 +133,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
         } else if (videoState == STATE_PLAYING) {
             pause();
         } else if (videoState == STATE_PAUSING) {
-            play();
+            requestPlay();
         }
     }
 
@@ -133,13 +141,12 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
         if (!isPreparing) {
             isPreparing = true;
             if (!TextUtils.isEmpty(path) && new File(path).exists()) {
-                videoView.setVideoPath(path);
                 videoView.setOnPreparedListener(this);
                 videoView.setOnCompletionListener(this);
                 videoView.setOnErrorListener(this);
-                videoView.start();
+                videoView.setVideoPath(path);
             } else {
-                if (onPlayClickLitener != null) onPlayClickLitener.onError("文件不存在");
+                if (onMediaPlayListener != null) onMediaPlayListener.onMediaError("文件不存在");
             }
         }
     }
@@ -154,50 +161,77 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        if (onMediaPlayListener != null) onMediaPlayListener.onMediaPrepared();
         mediaPlayer = mp;
-        mSeekBar.setMax(mediaPlayer.getDuration());
-        mSeekBar.setProgress(0);
         isPreparing = false;
+        videoState = STATE_PAUSING;
 
         if (seekTime != 0) {
-            mediaPlayer.seekTo(seekTime);
+            seek(seekTime);
             seekTime = 0;
+        } else {
+            freshTime();
+            freshSeekBar();
         }
 
-        if (canPlay) {
-            play();
+        //第一次初始化
+        if (isPrepare) {
+            isPrepare = false;
+            if (autoPlay) {
+                requestPlay();
+            }
+            return;
         }
-        canPlay = true;
+        //onResume 处理
+        if (isResumeCanPlay) {
+            requestPlay();
+        }
+        isResumeCanPlay = true;
     }
 
     public void pause() {
         handler.removeMessages(1);
         if (videoState == STATE_PLAYING) {
+            if (onMediaPlayListener != null) onMediaPlayListener.onMediaPause();
             videoView.pause();
             videoState = STATE_PAUSING;
-            playButton.setState(true);
+            playButtonView.setState(true);
         }
     }
 
     public void release() {
         handler.removeMessages(1);
-        if (mediaPlayer != null) mediaPlayer.release();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            if (onMediaPlayListener!=null)onMediaPlayListener.onMediaRelease();
+        }
         videoState = STATE_INIT;
     }
 
+
+    public synchronized void requestPlay() {
+        if (videoState != STATE_PLAYING && (hasFocus || AudioTool.requestPlay(getContext(), this))) {
+            hasFocus = true;
+            play();
+        }
+    }
+
     public void play() {
+        handler.removeMessages(1);
         if (videoState != STATE_PLAYING) {
+            if (onMediaPlayListener != null) onMediaPlayListener.onMediaPlay();
+
             videoView.start();
             videoState = STATE_PLAYING;
-            playButton.setState(false);
+            playButtonView.setState(false);
             handler.sendEmptyMessageDelayed(1, 1000);
         }
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (onPlayClickLitener != null) onPlayClickLitener.onPlayComplete();
-        playButton.setState(true);
+        if (onMediaPlayListener != null) onMediaPlayListener.onMediaPlayComplete();
+        playButtonView.setState(true);
         mSeekBar.setProgress(0);
         mTVTime.setText(getTimeStr(0, 0));
         videoState = STATE_PAUSING;
@@ -207,7 +241,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         handler.removeMessages(1);
-        if (onPlayClickLitener != null) onPlayClickLitener.onError("文件不存在");
+        if (onMediaPlayListener != null) onMediaPlayListener.onMediaError("文件不存在");
         videoState = STATE_INIT;
         return false;
     }
@@ -290,8 +324,8 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
      *
      * @param onPlayClickListener
      */
-    public void setOnPlayListener(OnVideoPlayListener onPlayClickListener) {
-        this.onPlayClickLitener = onPlayClickListener;
+    public void setOnPlayListener(OnMediaPlayListener onPlayClickListener) {
+        this.onMediaPlayListener = onPlayClickListener;
     }
 
     /**
@@ -336,6 +370,29 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
                 time -= 1000;
                 if (time < 0) time = 0;
                 mediaPlayer.seekTo(time);
+                freshTime();
+                freshSeekBar();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void freshSeekBar() {
+        if (mSeekBar != null) {
+            try {
+                mSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+                mSeekBar.setMax(mediaPlayer.getDuration());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void freshTime() {
+        if (mediaPlayer != null) {
+            try {
+                mTVTime.setText(getTimeStr(mediaPlayer.getCurrentPosition(), mediaPlayer.getDuration()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -397,7 +454,19 @@ public class VideoPlayerView extends RelativeLayout implements PlayButton.OnPlay
         if (mediaPlayer != null) {
             seekTime = mediaPlayer.getCurrentPosition();
         }
-        canPlay = videoState == STATE_PLAYING;
+        isResumeCanPlay = videoState == STATE_PLAYING;
         pause();
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        if (focusChange != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            hasFocus = false;
+            pause();
+        }
+    }
+
+    public void setOnPlayProgressListener(OnPlayProgressListener onPlayProgressListener) {
+        this.onPlayProgressListener = onPlayProgressListener;
     }
 }
