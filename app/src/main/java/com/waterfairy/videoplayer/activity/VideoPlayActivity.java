@@ -28,7 +28,6 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
         int seekTime = getIntent().getIntExtra(EXTRA_TIME, 0);
         seekTime -= 2000;
         if (seekTime < 0) seekTime = 0;
-        Log.i(TAG, "onCreate: " + seekTime);
         player = findViewById(R.id.player);
         player.setOnBackClickListener(this);
         player.setOnPlayListener(this);
@@ -91,7 +90,6 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) return true;
-        return super.onKeyDown(keyCode, event);
+        return keyCode == KeyEvent.KEYCODE_BACK || super.onKeyDown(keyCode, event);
     }
 }
