@@ -82,7 +82,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     public VideoPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        addView(LayoutInflater.from(context).inflate(R.layout.layout_play_video, this, false));
+        addView(LayoutInflater.from(context).inflate(R.layout.layout_video_player_video_play, this, false));
         findView();
         initView();
     }

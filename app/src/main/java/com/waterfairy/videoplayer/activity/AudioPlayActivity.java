@@ -19,7 +19,7 @@ public class AudioPlayActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play_audio);
+        setContentView(R.layout.activity_video_player_audio_play);
         audioPlayerView = findViewById(R.id.audio_player);
         audioPlayerView.setAutoPlay(true);
         audioPlayerView.setOnPlayListener(this);

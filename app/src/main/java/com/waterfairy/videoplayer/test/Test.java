@@ -1,7 +1,6 @@
 package com.waterfairy.videoplayer.test;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,7 +21,7 @@ public class Test extends AppCompatActivity implements OnPlayProgressListener, O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_video_player_test);
         videoPlayerView = findViewById(R.id.video_player_view);
         videoPlayerView.setTitle("hhhhhhhhh");
         videoPlayerView.setOnPlayListener(this);

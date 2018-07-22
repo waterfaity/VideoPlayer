@@ -65,7 +65,7 @@ public class AudioPlayerView extends RelativeLayout implements PlayButtonView.On
 
     public AudioPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        addView(LayoutInflater.from(context).inflate(R.layout.layout_play_audio, this, false));
+        addView(LayoutInflater.from(context).inflate(R.layout.layout_video_player_audio_play, this, false));
         findView();
         initView();
     }

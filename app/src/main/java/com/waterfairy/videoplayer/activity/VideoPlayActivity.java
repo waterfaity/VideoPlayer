@@ -2,7 +2,6 @@ package com.waterfairy.videoplayer.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -22,7 +21,7 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play_video);
+        setContentView(R.layout.activity_video_player_video_play);
         String videoPath = getIntent().getStringExtra(EXTRA_PATH);
         int seekTime = getIntent().getIntExtra(EXTRA_TIME, 0);
         seekTime -= 2000;
