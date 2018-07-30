@@ -26,7 +26,7 @@ public class Test extends AppCompatActivity implements OnPlayProgressListener, O
         videoPlayerView.setTitle("hhhhhhhhh");
         videoPlayerView.setOnPlayListener(this);
 
-        videoPlayerView.setPath("/sdcard/test/video/video_test.mp4");
+        videoPlayerView.setPath("/sdcard/test/video/video_test1.mp4");
         videoPlayerView.setOnPlayProgressListener(this);
         audioPlayer = findViewById(R.id.audio_player);
         audioPlayer.setPath("/sdcard/test/audio/audio_test.mp3");

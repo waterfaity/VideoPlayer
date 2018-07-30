@@ -8,8 +8,8 @@
 
     <VideoView
         android:id="@+id/video_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"/>
 
     <RelativeLayout
@@ -27,12 +27,12 @@
 
         <TextView
             android:id="@+id/tv_title"
-            android:singleLine="true"
-            android:paddingRight="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/img_back"
+            android:paddingRight="16dp"
+            android:singleLine="true"
             android:textColor="@android:color/white"
             android:textSize="16dp"/>
     </RelativeLayout>
@@ -43,7 +43,8 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
-        android:background="#66888888">
+        android:background="#66888888"
+        android:clickable="true">
 
         <com.waterfairy.videoplayer.widget.PlayButtonView
             android:id="@+id/bt_play"
