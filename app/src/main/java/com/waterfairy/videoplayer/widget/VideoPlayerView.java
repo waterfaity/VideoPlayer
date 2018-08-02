@@ -20,6 +20,7 @@ import android.widget.VideoView;
 import com.waterfairy.videoplayer.R;
 import com.waterfairy.videoplayer.activity.VideoPlayActivity;
 import com.waterfairy.videoplayer.listener.OnBackClickListener;
+import com.waterfairy.videoplayer.listener.OnButtonDismissListener;
 import com.waterfairy.videoplayer.listener.OnClickMaxWindowListener;
 import com.waterfairy.videoplayer.listener.OnMediaPlayListener;
 import com.waterfairy.videoplayer.listener.OnPlayProgressListener;
@@ -62,6 +63,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private OnClickMaxWindowListener onMaxWindowClickListener;
     private OnPlayProgressListener onPlayProgressListener;
     private OnBackClickListener onBackClickListener;
+    private OnButtonDismissListener onButtonDismissListener;
 
     private final int STATE_INIT = 0;
     private final int STATE_PLAYING = 1;
@@ -69,7 +71,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     private int videoState;
     private int seekTime;
-     private boolean isResumeCanPlay = true;
+    private boolean isResumeCanPlay = true;
     private boolean isPrepare;//准备
     private boolean hasFocus;
     private boolean showBack;
@@ -203,7 +205,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
         handler.removeMessages(1);
         if (mediaPlayer != null) {
             mediaPlayer.release();
-            if (onMediaPlayListener!=null)onMediaPlayListener.onMediaRelease();
+            if (onMediaPlayListener != null) onMediaPlayListener.onMediaRelease();
         }
         videoState = STATE_INIT;
     }
@@ -252,12 +254,18 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
         if (v.getId() == R.id.video_view || v.getId() == R.id.bg_view) {
             if (mRLButton.getVisibility() == GONE) {
                 mRLButton.setVisibility(VISIBLE);
+                if (onButtonDismissListener != null) {
+                    onButtonDismissListener.onButtonDismiss(VISIBLE);
+                }
                 if (showBack) {
                     mRLBack.setVisibility(VISIBLE);
                 }
             } else {
                 mRLBack.setVisibility(GONE);
                 mRLButton.setVisibility(GONE);
+                if (onButtonDismissListener != null) {
+                    onButtonDismissListener.onButtonDismiss(GONE);
+                }
             }
         } else if (R.id.img_max_window == v.getId()) {
             if (onMaxWindowClickListener != null) onMaxWindowClickListener.onMaxWindowClick();
@@ -468,5 +476,9 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     public void setOnPlayProgressListener(OnPlayProgressListener onPlayProgressListener) {
         this.onPlayProgressListener = onPlayProgressListener;
+    }
+
+    public void setOnButtonDismissListener(OnButtonDismissListener onButtonDismissListener) {
+        this.onButtonDismissListener = onButtonDismissListener;
     }
 }
