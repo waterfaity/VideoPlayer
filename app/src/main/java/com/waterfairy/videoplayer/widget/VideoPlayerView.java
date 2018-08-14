@@ -375,7 +375,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private void seek(int time) {
         if (mediaPlayer != null) {
             try {
-                time -= 1000;
+                time -= 10;
                 if (time < 0) time = 0;
                 mediaPlayer.seekTo(time);
                 freshTime();

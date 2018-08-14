@@ -24,7 +24,7 @@ public class VideoPlayActivity extends AppCompatActivity implements OnBackClickL
         setContentView(R.layout.activity_video_player_video_play);
         String videoPath = getIntent().getStringExtra(EXTRA_PATH);
         int seekTime = getIntent().getIntExtra(EXTRA_TIME, 0);
-        seekTime -= 2000;
+        seekTime -= 500;
         if (seekTime < 0) seekTime = 0;
         player = findViewById(R.id.player);
         player.setOnBackClickListener(this);
