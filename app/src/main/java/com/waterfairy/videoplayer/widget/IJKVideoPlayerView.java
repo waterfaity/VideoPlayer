@@ -3,24 +3,20 @@ package com.waterfairy.videoplayer.widget;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.waterfairy.videoplayer.R;
 import com.waterfairy.videoplayer.activity.IJKVideoPlayActivity;
-import com.waterfairy.videoplayer.activity.VideoPlayActivity;
 import com.waterfairy.videoplayer.listener.OnBackClickListener;
 import com.waterfairy.videoplayer.listener.OnButtonDismissListener;
 import com.waterfairy.videoplayer.listener.OnClickMaxWindowListener;
@@ -33,7 +29,6 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * @author water_fairy
