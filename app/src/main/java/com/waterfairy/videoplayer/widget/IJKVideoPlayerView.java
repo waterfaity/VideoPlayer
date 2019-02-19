@@ -9,6 +9,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -31,18 +32,21 @@ import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
+import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+
 /**
  * @author water_fairy
  * @email 995637517@qq.com
  * @date 2018/7/20 10:38
  * @info:
  */
-public class VideoPlayerView extends RelativeLayout implements PlayButtonView.OnPlayClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, AudioManager.OnAudioFocusChangeListener {
+public class IJKVideoPlayerView extends RelativeLayout implements PlayButtonView.OnPlayClickListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, AudioManager.OnAudioFocusChangeListener, IJKVideoView.VideoPlayerListener {
 
     private static final String TAG = "VideoPlayerView";
     private SimpleDateFormat simpleDateFormat;
     //view
-    private VideoView videoView;
+    private IJKVideoView videoView;
     private RelativeLayout mRLButton;
     private RelativeLayout mRLBack;
     private TextView mTVTitle;
@@ -53,8 +57,6 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private SeekBar mSeekBar;
     private Toast toast;
 
-
-    private MediaPlayer mediaPlayer;
 
     private String title;
     private String path;//
@@ -78,22 +80,18 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private boolean showBack;
     private boolean isPreparing;
     private boolean autoPlay;
+    private boolean isMaxWindow = false;
 
     private final int freshDelay = 250;
-    private boolean isMaxWindow;
-    private boolean jumpMaxActivity;
+    private boolean jumpMaxActivity = false;
 
-    public void setJumpMaxActivity(boolean jumpMaxActivity) {
-        this.jumpMaxActivity = jumpMaxActivity;
-    }
-
-    public VideoPlayerView(Context context) {
+    public IJKVideoPlayerView(Context context) {
         this(context, null);
     }
 
-    public VideoPlayerView(Context context, AttributeSet attrs) {
+    public IJKVideoPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        addView(LayoutInflater.from(context).inflate(R.layout.layout_video_player_video_play, this, false));
+        addView(LayoutInflater.from(context).inflate(R.layout.layout_ijk_video_player_video_play, this, false));
         findView();
         initView();
     }
@@ -120,7 +118,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     private void findView() {
         playButtonView = findViewById(R.id.bt_play);
-        videoView = findViewById(R.id.video_view);
+        videoView = findViewById(R.id.ijk_video_view);
         mRLButton = findViewById(R.id.rel_play);
         mIVMaxWindow = findViewById(R.id.img_max_window);
         mTVTime = findViewById(R.id.time);
@@ -151,11 +149,9 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private void initVideo() {
         if (!isPreparing) {
             isPreparing = true;
-            if (!TextUtils.isEmpty(path) && new File(path).exists()) {
-                videoView.setOnPreparedListener(this);
-                videoView.setOnCompletionListener(this);
-                videoView.setOnErrorListener(this);
+            if (!TextUtils.isEmpty(path) && (new File(path).exists() || path.startsWith("http"))) {
                 videoView.setVideoPath(path);
+                videoView.setListener(this);
             } else {
                 if (onMediaPlayListener != null) onMediaPlayListener.onMediaError("文件不存在");
             }
@@ -171,9 +167,9 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     }
 
     @Override
-    public void onPrepared(MediaPlayer mp) {
+    public void onPrepared(IMediaPlayer iMediaPlayer) {
+        if (iMediaPlayer.isPlaying()) iMediaPlayer.pause();
         if (onMediaPlayListener != null) onMediaPlayListener.onMediaPrepared();
-        mediaPlayer = mp;
         isPreparing = false;
         videoState = STATE_PAUSING;
 
@@ -200,6 +196,29 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
         isResumeCanPlay = true;
     }
 
+    @Override
+    public boolean onInfo(IMediaPlayer iMediaPlayer, int i, int i1) {
+        return false;
+    }
+
+    @Override
+    public void onSeekComplete(IMediaPlayer iMediaPlayer) {
+
+    }
+
+    @Override
+    public void onBufferingUpdate(IMediaPlayer iMediaPlayer, int i) {
+
+    }
+
+    @Override
+    public boolean onError(IMediaPlayer iMediaPlayer, int i, int i1) {
+        handler.removeMessages(1);
+        if (onMediaPlayListener != null) onMediaPlayListener.onMediaError("文件不存在");
+        videoState = STATE_INIT;
+        return false;
+    }
+
     public void pause() {
         handler.removeMessages(1);
         if (videoState == STATE_PLAYING) {
@@ -212,8 +231,8 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     public void release() {
         handler.removeMessages(1);
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
+        if (videoView != null) {
+            videoView.release();
             if (onMediaPlayListener != null) onMediaPlayListener.onMediaRelease();
         }
         videoState = STATE_INIT;
@@ -231,7 +250,6 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
         handler.removeMessages(1);
         if (videoState != STATE_PLAYING) {
             if (onMediaPlayListener != null) onMediaPlayListener.onMediaPlay();
-
             videoView.start();
             videoState = STATE_PLAYING;
             playButtonView.setState(false);
@@ -239,28 +257,10 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
         }
     }
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        if (onMediaPlayListener != null) onMediaPlayListener.onMediaPlayComplete();
-        playButtonView.setState(true);
-        mSeekBar.setProgress(0);
-        mTVTime.setText(getTimeStr(0, 0));
-        videoState = STATE_PAUSING;
-        handler.removeMessages(1);
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        handler.removeMessages(1);
-        if (onMediaPlayListener != null) onMediaPlayListener.onMediaError("文件不存在");
-        videoState = STATE_INIT;
-        return false;
-    }
-
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.video_view || v.getId() == R.id.bg_view) {
+        if (v.getId() == R.id.ijk_video_view || v.getId() == R.id.bg_view) {
             if (mRLButton.getVisibility() == GONE) {
                 mRLButton.setVisibility(VISIBLE);
                 if (onButtonDismissListener != null) {
@@ -292,8 +292,9 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
                     getContext().startActivity(intent);
                 }
             }
+            isMaxWindow = !isMaxWindow;
             if (onMaxWindowClickListener != null)
-                onMaxWindowClickListener.onMaxWindowClick(isMaxWindow = !isMaxWindow);
+                onMaxWindowClickListener.onMaxWindowClick(isMaxWindow);
 
         } else if (R.id.img_back == v.getId()) {
             handler.removeMessages(1);
@@ -307,11 +308,11 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
             super.handleMessage(msg);
             if (msg.what == 1) {
                 handler.removeMessages(1);
-                if (mediaPlayer != null) {
+                if (videoView != null) {
                     try {
-                        int currentPosition = mediaPlayer.getCurrentPosition();
-                        int duration = mediaPlayer.getDuration();
-                        mSeekBar.setProgress(currentPosition);
+                        long currentPosition = videoView.getCurrentPosition();
+                        long duration = videoView.getDuration();
+                        mSeekBar.setProgress((int) currentPosition);
                         mTVTime.setText(getTimeStr(currentPosition, duration));
                         if (onPlayProgressListener != null)
                             onPlayProgressListener.onPlayProgress(currentPosition, duration);
@@ -332,7 +333,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
      * @param totalTime
      * @return
      */
-    private String getTimeStr(int currentPosition, int totalTime) {
+    private String getTimeStr(long currentPosition, long totalTime) {
         if (simpleDateFormat == null) {
             if (totalTime > 60 * 60 * 1000) {
                 simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -390,11 +391,11 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
      * @param time
      */
     private void seek(int time) {
-        if (mediaPlayer != null) {
+        if (videoView != null) {
             try {
                 time -= 10;
                 if (time < 0) time = 0;
-                mediaPlayer.seekTo(time);
+                videoView.seekTo(time);
                 freshTime();
                 freshSeekBar();
             } catch (Exception e) {
@@ -406,8 +407,8 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private void freshSeekBar() {
         if (mSeekBar != null) {
             try {
-                mSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-                mSeekBar.setMax(mediaPlayer.getDuration());
+                mSeekBar.setProgress((int) videoView.getCurrentPosition());
+                mSeekBar.setMax((int) videoView.getDuration());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -415,9 +416,9 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     }
 
     private void freshTime() {
-        if (mediaPlayer != null) {
+        if (videoView != null) {
             try {
-                mTVTime.setText(getTimeStr(mediaPlayer.getCurrentPosition(), mediaPlayer.getDuration()));
+                mTVTime.setText(getTimeStr(videoView.getCurrentPosition(), videoView.getDuration()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -476,8 +477,8 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
 
     public void onPause() {
-        if (mediaPlayer != null) {
-            seekTime = mediaPlayer.getCurrentPosition();
+        if (videoView != null) {
+            seekTime = (int) videoView.getCurrentPosition();
         }
         isResumeCanPlay = videoState == STATE_PLAYING;
         pause();
@@ -497,5 +498,24 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     public void setOnButtonDismissListener(OnButtonDismissListener onButtonDismissListener) {
         this.onButtonDismissListener = onButtonDismissListener;
+    }
+
+    /**
+     * 点击点转另一个全屏activity播放
+     *
+     * @param jumpMaxActivity
+     */
+    public void setJumpMaxActivity(boolean jumpMaxActivity) {
+        this.jumpMaxActivity = jumpMaxActivity;
+    }
+
+    @Override
+    public void onCompletion(IMediaPlayer mp) {
+        if (onMediaPlayListener != null) onMediaPlayListener.onMediaPlayComplete();
+        playButtonView.setState(true);
+        mSeekBar.setProgress(0);
+        mTVTime.setText(getTimeStr(0, 0));
+        videoState = STATE_PAUSING;
+        handler.removeMessages(1);
     }
 }

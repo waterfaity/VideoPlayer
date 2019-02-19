@@ -11,10 +11,11 @@ import com.waterfairy.videoplayer.activity.AudioPlayActivity;
 import com.waterfairy.videoplayer.listener.OnMediaPlayListener;
 import com.waterfairy.videoplayer.listener.OnPlayProgressListener;
 import com.waterfairy.videoplayer.widget.AudioPlayerView;
+import com.waterfairy.videoplayer.widget.IJKVideoPlayerView;
 import com.waterfairy.videoplayer.widget.VideoPlayerView;
 
 public class Test extends AppCompatActivity implements OnPlayProgressListener, OnMediaPlayListener {
-    VideoPlayerView videoPlayerView;
+    IJKVideoPlayerView videoPlayerView;
     AudioPlayerView audioPlayer;
     private static final String TAG = "avPlayTest";
 
@@ -26,8 +27,10 @@ public class Test extends AppCompatActivity implements OnPlayProgressListener, O
         videoPlayerView.setTitle("hhhhhhhhh");
         videoPlayerView.setOnPlayListener(this);
 
-        videoPlayerView.setPath("/sdcard/test/video/video_test1.mp4");
+        videoPlayerView.setPath("http://v.xueduoduo.com/math11.mp4");
+//        videoPlayerView.setPath("/sdcard/test/video/video_test1.mp4");
         videoPlayerView.setOnPlayProgressListener(this);
+        videoPlayerView.setAutoPlay(true);
         audioPlayer = findViewById(R.id.audio_player);
         audioPlayer.setPath("/sdcard/test/audio/audio_test.mp3");
         audioPlayer.setOnPlayListener(this);

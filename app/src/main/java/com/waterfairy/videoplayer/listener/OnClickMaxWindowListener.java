@@ -7,5 +7,5 @@ package com.waterfairy.videoplayer.listener;
  * @info:
  */
 public interface OnClickMaxWindowListener {
-    void onMaxWindowClick();
+    void onMaxWindowClick(boolean b);
 }
