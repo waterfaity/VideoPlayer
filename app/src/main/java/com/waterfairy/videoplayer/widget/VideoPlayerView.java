@@ -149,7 +149,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private void initVideo() {
         if (!isPreparing) {
             isPreparing = true;
-            if (!TextUtils.isEmpty(path) && (new File(path).exists() || path.startsWith("http"))) {
+            if (!TextUtils.isEmpty(path) || path.startsWith("http")) {
                 videoView.setOnPreparedListener(this);
                 videoView.setOnCompletionListener(this);
                 videoView.setOnErrorListener(this);
