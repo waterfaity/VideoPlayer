@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".test.Test">
 
-    <com.waterfairy.videoplayer.widget.IJKVideoPlayerView
+    <com.waterfairy.videoplayer.widget.VideoPlayerView
         android:layout_above="@+id/audio_player"
         android:id="@+id/video_player_view"
         android:layout_width="match_parent"

@@ -18,8 +18,6 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.waterfairy.videoplayer.R;
-import com.waterfairy.videoplayer.activity.IJKVideoPlayActivity;
-import com.waterfairy.videoplayer.activity.VideoPlayActivity;
 import com.waterfairy.videoplayer.listener.OnBackClickListener;
 import com.waterfairy.videoplayer.listener.OnButtonDismissListener;
 import com.waterfairy.videoplayer.listener.OnClickMaxWindowListener;
@@ -151,7 +149,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     private void initVideo() {
         if (!isPreparing) {
             isPreparing = true;
-            if (!TextUtils.isEmpty(path) && new File(path).exists()) {
+            if (!TextUtils.isEmpty(path) && (new File(path).exists() || path.startsWith("http"))) {
                 videoView.setOnPreparedListener(this);
                 videoView.setOnCompletionListener(this);
                 videoView.setOnErrorListener(this);
@@ -283,13 +281,6 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
                 mIVMaxWindow.setImageResource(R.mipmap.icon_window_min);
                 if (jumpMaxActivity) {
                     pause();
-                    Intent intent = new Intent(getContext(), IJKVideoPlayActivity.class);
-                    intent.putExtra(IJKVideoPlayActivity.EXTRA_PATH, path);
-                    if (videoView != null) {
-                        intent.putExtra(IJKVideoPlayActivity.EXTRA_TIME, videoView.getCurrentPosition());
-                    }
-                    intent.putExtra(IJKVideoPlayActivity.EXTRA_TITLE, title);
-                    getContext().startActivity(intent);
                 }
             }
             if (onMaxWindowClickListener != null)

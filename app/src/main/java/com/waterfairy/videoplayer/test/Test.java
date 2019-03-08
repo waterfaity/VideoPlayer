@@ -11,26 +11,16 @@ import com.waterfairy.videoplayer.activity.AudioPlayActivity;
 import com.waterfairy.videoplayer.listener.OnMediaPlayListener;
 import com.waterfairy.videoplayer.listener.OnPlayProgressListener;
 import com.waterfairy.videoplayer.widget.AudioPlayerView;
-import com.waterfairy.videoplayer.widget.IJKVideoPlayerView;
-import com.waterfairy.videoplayer.widget.VideoPlayerView;
 
 public class Test extends AppCompatActivity implements OnPlayProgressListener, OnMediaPlayListener {
-    IJKVideoPlayerView videoPlayerView;
-    AudioPlayerView audioPlayer;
+     AudioPlayerView audioPlayer;
     private static final String TAG = "avPlayTest";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player_test);
-        videoPlayerView = findViewById(R.id.video_player_view);
-        videoPlayerView.setTitle("hhhhhhhhh");
-        videoPlayerView.setOnPlayListener(this);
 
-        videoPlayerView.setPath("http://v.xueduoduo.com/math11.mp4");
-//        videoPlayerView.setPath("/sdcard/test/video/video_test1.mp4");
-        videoPlayerView.setOnPlayProgressListener(this);
-        videoPlayerView.setAutoPlay(true);
         audioPlayer = findViewById(R.id.audio_player);
         audioPlayer.setPath("/sdcard/test/audio/audio_test.mp3");
         audioPlayer.setOnPlayListener(this);
@@ -42,14 +32,12 @@ public class Test extends AppCompatActivity implements OnPlayProgressListener, O
     protected void onDestroy() {
         super.onDestroy();
         audioPlayer.release();
-        videoPlayerView.release();
-    }
+     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (videoPlayerView != null) videoPlayerView.onPause();
-    }
+     }
 
     public void onClick(View view) {
         Intent intent = new Intent(this, AudioPlayActivity.class);
