@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
  * @date 2018/7/20 10:38
  * @info:
  */
-public class VideoPlayerView extends RelativeLayout implements PlayButtonView.OnPlayClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, AudioManager.OnAudioFocusChangeListener {
+public class VideoPlayerView extends RelativeLayout implements PlayButtonView.OnPlayClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnBufferingUpdateListener {
 
     private static final String TAG = "VideoPlayerView";
     private SimpleDateFormat simpleDateFormat;
@@ -172,6 +172,7 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
     public void onPrepared(MediaPlayer mp) {
         if (onMediaPlayListener != null) onMediaPlayListener.onMediaPrepared();
         mediaPlayer = mp;
+        mediaPlayer.setOnBufferingUpdateListener(this);
         isPreparing = false;
         videoState = STATE_PAUSING;
 
@@ -488,5 +489,10 @@ public class VideoPlayerView extends RelativeLayout implements PlayButtonView.On
 
     public void setOnButtonDismissListener(OnButtonDismissListener onButtonDismissListener) {
         this.onButtonDismissListener = onButtonDismissListener;
+    }
+
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        mSeekBar.setSecondaryProgress((int) (mediaPlayer.getDuration() * (percent / 100F)));
     }
 }
